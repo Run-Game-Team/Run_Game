@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary; // 바이너리 파일 포맷을 위한 네임스페이스
+using System.Runtime.Serialization.Formatters.Binary;
+using UnityEditor; // 바이너리 파일 포맷을 위한 네임스페이스
 
 // 게임 데이터를 저장, 로드하는 기능
 public class DataManager : MonoBehaviour
@@ -13,7 +14,10 @@ public class DataManager : MonoBehaviour
 
     public string dataPath;
     public string userName; // 파일명을 처음 입력한 유저 이름으로 설정
+    public string password; // 파일명을 처음 입력한 유저 비밀번호로 설정
     public string fileExtension = ".dat";
+    public bool successLogin = false;
+    public int myHighestScore = 0;
 
     private void Awake()
     {
@@ -26,10 +30,17 @@ public class DataManager : MonoBehaviour
     }
 
     // 경로, 파일명 설정
-    public void Initialize(string name)
+    public void Initialize(string name, string pw)
     {
         userName = name;
+        password = pw;
         dataPath = Application.persistentDataPath + userName + fileExtension;        
+    }
+
+    public void SetNameAndPassword(string name, string pw)
+    {
+        userName = name;
+        password = pw;
     }
 
     public void Save(GameData gameData)
