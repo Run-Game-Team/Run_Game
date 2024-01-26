@@ -12,6 +12,7 @@ namespace Chatting_Server
     internal class MyServer
     {
         ClientManager _clientManager = null;
+        Thread connectCheckThread = null;
 
         public MyServer()
         {
@@ -22,22 +23,24 @@ namespace Chatting_Server
             //    ServerRun();
             //});
             ServerRun();
+
+            connectCheckThread = new Thread(ConnectCheckLoop);
+            connectCheckThread.Start();
         }
 
         // 하트비트 스레드
-        private void ConnectCheckLoop()
+        private async void ConnectCheckLoop()
         {
-            while(true)
+            while (true)
             {
                 foreach (var item in ClientManager.clientDic)
                 {
                     try
                     {
                         string sendStringData = "관리자<TEST>";
-                        byte[] sendByteData = new byte[sendStringData.Length];
-                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                        byte[] sendByteData = Encoding.UTF8.GetBytes(sendStringData);
 
-                        item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        await item.Value.tcpClient.GetStream().WriteAsync(sendByteData, 0, sendByteData.Length);
                     }
                     catch (Exception e)
                     {
@@ -45,7 +48,7 @@ namespace Chatting_Server
                     }
                 }
 
-                Thread.Sleep(1000);
+                await Task.Delay(1000);
             }
         }
 
@@ -55,29 +58,6 @@ namespace Chatting_Server
             ClientData result = null;
             ClientManager.clientDic.TryRemove(client.clientNumber, out result);
         }
-
-        // 클라이언트에게 메시지를 보내는 과정 1
-        private void MessageParsing(string sender, string message)
-        {
-            List<string> msgList = new List<string>();
-
-            string[] msgArray = message.Split('>');
-            foreach (var item in msgArray)
-            {
-                if (string.IsNullOrEmpty(item))
-                {
-                    continue;
-                }
-                msgList.Add(item);
-            }
-        }
-
-        // 클라이언트에게 메시지를 보내는 과정 2
-        private void SendMsgToClient(List<string> msgList, string sender)
-        {
-
-        }
-
 
         private void ServerRun()
         {
@@ -96,6 +76,15 @@ namespace Chatting_Server
                 TcpClient newClient = acceptTask.Result;
 
                 _clientManager.AddClient(newClient);
+
+                foreach (var item in ClientManager.clientDic)
+                {
+                    NetworkStream stream = item.Value.tcpClient.GetStream();
+                    byte[] data = Encoding.UTF8.GetBytes("test");
+
+                    // 메시지 전송
+                    stream.Write(data, 0, data.Length);
+                }
             }
         }
     }

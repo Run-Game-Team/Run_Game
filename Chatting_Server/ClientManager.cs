@@ -42,7 +42,6 @@ namespace Chatting_Server
 
             try
             {
-                
                 int bytesRead = client.tcpClient.GetStream().EndRead(asyncResult);
                 if (bytesRead > 0)
                 {
@@ -59,9 +58,20 @@ namespace Chatting_Server
                         client.readByteData.Length,
                         new AsyncCallback(DataReceived),
                         client);
+
+                    if (string.IsNullOrEmpty(client.clientName))
+                    {
+                        string userName = "test";
+                        client.clientName = userName;
+                    }
+
+                    //if (messageParsingAction != null)
+                    //{
+                    //    messageParsingAction.BeginInvoke(client.clientName, strData, null, null);
+                    //}
                 }
-                else
-                    Console.WriteLine("{0}번 플레이어의 연결이 끊어졌습니다.", client.clientNumber);
+                //else
+                //    Console.WriteLine("{0}번 플레이어의 연결이 끊어졌습니다.", client.clientNumber);
             }
             catch (Exception e)
             {
