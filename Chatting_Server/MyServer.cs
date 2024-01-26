@@ -16,7 +16,7 @@ namespace Chatting_Server
         public MyServer()
         {
             _clientManager = new ClientManager();
-            _clientManager.messageParsingAction += MessageParsing;
+            //_clientManager.messageParsingAction += MessageParsing;
             //Task serverStart = Task.Run(() =>
             //{
             //    ServerRun();
@@ -70,13 +70,12 @@ namespace Chatting_Server
                 }
                 msgList.Add(item);
             }
-
         }
 
         // 클라이언트에게 메시지를 보내는 과정 2
         private void SendMsgToClient(List<string> msgList, string sender)
         {
-            
+
         }
 
 
